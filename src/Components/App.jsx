@@ -1,79 +1,102 @@
-/* eslint-disable react/no-array-index-key */
 import React from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import InputGroup from 'react-bootstrap/InputGroup';
-import ListGroup from 'react-bootstrap/ListGroup';
-import socketIOClient from 'socket.io-client';
-import styled from 'styled-components';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
+import Jumbotron from 'react-bootstrap/Jumbotron';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Chatroom from './Chatroom';
+import { animals, colors } from '../../data';
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      allMessages: [],
-      endpoint: 'http://127.0.0.1:3000',
-      text: '',
+      username: '',
+      hasUsername: false,
     };
-    this.updateText = this.updateText.bind(this);
-    this.sendMessage = this.sendMessage.bind(this);
-    this.appendMessage = this.appendMessage.bind(this);
+    this.updateUsername = this.updateUsername.bind(this);
+    this.generateName = this.generateName.bind(this);
+    this.redirect = this.redirect.bind(this);
   }
 
-  componentDidMount() {
-    const { endpoint } = this.state;
-    this.socket = socketIOClient(endpoint);
-    this.socket.on('append message', this.appendMessage);
+  generateName() {
+    const random = (list) => list[Math.floor(Math.random() * list.length)];
+    this.setState({ username: random(colors).concat(random(animals)) });
   }
 
-  appendMessage(msg) {
-    const { allMessages } = this.state;
-    this.setState({ allMessages: [...allMessages, msg] });
+  updateUsername(e) {
+    this.setState({ [e.target.name]: e.target.value });
   }
 
-  sendMessage(event) {
-    const { text } = this.state;
-    event.preventDefault();
-    this.socket.emit('append message', text);
-    this.setState({ text: '' });
-  }
-
-  updateText(event) {
-    this.setState({ text: event.target.value });
+  redirect(e) {
+    e.preventDefault();
+    this.setState({ hasUsername: true });
   }
 
   render() {
-    const { text, allMessages } = this.state;
+    const { hasUsername, username } = this.state;
     return (
-      <Chat>
-        <Title>Babbler</Title>
-        <ListGroup style={{ flexGrow: 1 }}>
-          {
-            allMessages.map((message, index) => <ListGroup.Item key={index}>{message}</ListGroup.Item>)
-          }
-        </ListGroup>
-        <Draft onSubmit={this.sendMessage}>
-          <Form.Group controlId="chatTextBox">
-            <Form.Control value={text} type="text" placeholder="Enter Text" onChange={this.updateText} />
-          </Form.Group>
-        </Draft>
-      </Chat>
+      <>
+        {
+        !hasUsername && (
+          <>
+            <Jumbotron className="jumbotron">
+              <h1> Welcome To Babbler!</h1>
+              <p>
+                This is a chatroom application that is free to use and built with react-bootstrap.
+                Create your personal username or generate a random one and start chatting!
+              </p>
+            </Jumbotron>
+            <Form onSubmit={this.redirect}>
+              <Form.Group className="username">
+                <Form.Label>Create Username</Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    required
+                    type="text"
+                    name="username"
+                    value={username}
+                    placeholder="Enter Username"
+                    onChange={this.updateUsername}
+                  />
+                  <InputGroup.Append>
+                    <Button type="button" onClick={this.generateName}>Generate Random</Button>
+                  </InputGroup.Append>
+                </InputGroup>
+              </Form.Group>
+              {/* <Form.Group className="joinRoom">
+                <Form.Label>Join Room</Form.Label>
+                <InputGroup>
+                  <DropdownButton title="Rooms">
+                    <Dropdown.Item>Test</Dropdown.Item>
+                  </DropdownButton>
+                </InputGroup>
+              </Form.Group>
+              <Form.Group className="createRoom">
+                <Form.Label>Create a Room</Form.Label>
+                <InputGroup>
+                  <InputGroup.Prepend>
+                    <InputGroup.Text>Room Name</InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter Room Name"
+                  />
+                </InputGroup>
+              </Form.Group> */}
+              <Form.Group>
+                <Button type="submit" onSubmit={this.redirect}>Start Chatting</Button>
+              </Form.Group>
+            </Form>
+          </>
+        )
+      }
+        {
+        hasUsername && <Chatroom username={username} />
+      }
+      </>
     );
   }
 }
-
-const Title = styled.h1`
-  color: blueviolet;
-  align-self: center;
-`;
-
-const Chat = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-`;
-
-const Draft = styled(Form)`
-  align-self: flex-end;
-  width: 100vw;
-`;
