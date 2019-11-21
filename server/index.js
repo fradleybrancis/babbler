@@ -17,14 +17,19 @@ app.use(express.static(path.resolve(__dirname, '../dist')));
 io.on('connection', (client) => {
   console.log('a user connected');
 
+  let roomName = 'general';
+
+  client.on('create room', (room) => {
+    roomName = room;
+    client.join(roomName);
+  });
+
   client.on('append message', (message) => {
     console.log('message: ', message);
-    io.emit('append message', message);
+    client.to(roomName).emit('append message', message);
   });
 
   client.on('disconnect', () => console.log('a user disonnected'));
 });
-
-// https://api.darksky.net/forecast/289097115a1fe942506c4d6c8dd58f9f/37.8267,-122.4233
 
 server.listen(port, () => console.log('listening on port ', port));
