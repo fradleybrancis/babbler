@@ -3,9 +3,7 @@ const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
-const axios = require('axios');
-const routes = require('./routes.js');
-const ApiKey = require('../ignore');
+
 
 const app = express();
 const server = http.createServer(app);
