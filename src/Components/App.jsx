@@ -23,7 +23,7 @@ export default class App extends React.Component {
 
   generateName() {
     const random = (list) => list[Math.floor(Math.random() * list.length)];
-    this.setState({ username: random(colors).concat(random(animals)) });
+    this.setState({ username: random(animals) });
   }
 
   updateUsername(e) {
@@ -42,7 +42,7 @@ export default class App extends React.Component {
         {
         !hasUsername && (
           <>
-            <Jumbotron className="jumbotron">
+            <Jumbotron style={{ backgroundColor: 'CadetBlue' }}>
               <h1> Welcome To Babbler!</h1>
               <p>
                 This is a chatroom application that is free to use and built with react-bootstrap.
@@ -55,39 +55,20 @@ export default class App extends React.Component {
                 <InputGroup>
                   <Form.Control
                     required
+                    autoComplete="off"
                     type="text"
                     name="username"
                     value={username}
-                    placeholder="Enter Username"
+                    placeholder="Generate or Create a Username"
                     onChange={this.updateUsername}
                   />
                   <InputGroup.Append>
-                    <Button type="button" onClick={this.generateName}>Generate Random</Button>
+                    <Button type="button" onClick={this.generateName} variant="info">Generate Random</Button>
                   </InputGroup.Append>
                 </InputGroup>
               </Form.Group>
-              {/* <Form.Group className="joinRoom">
-                <Form.Label>Join Room</Form.Label>
-                <InputGroup>
-                  <DropdownButton title="Rooms">
-                    <Dropdown.Item>Test</Dropdown.Item>
-                  </DropdownButton>
-                </InputGroup>
-              </Form.Group>
-              <Form.Group className="createRoom">
-                <Form.Label>Create a Room</Form.Label>
-                <InputGroup>
-                  <InputGroup.Prepend>
-                    <InputGroup.Text>Room Name</InputGroup.Text>
-                  </InputGroup.Prepend>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Room Name"
-                  />
-                </InputGroup>
-              </Form.Group> */}
               <Form.Group>
-                <Button type="submit" onSubmit={this.redirect}>Start Chatting</Button>
+                <Button variant="success" type="submit" onSubmit={this.redirect}>Start Chatting</Button>
               </Form.Group>
             </Form>
           </>
